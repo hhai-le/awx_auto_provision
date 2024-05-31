@@ -66,5 +66,5 @@ docker compose up -d
 
 
 
-docker exec -it gitlab-ce grep 'Password:' /etc/gitlab/initial_root_password
-docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+#docker exec -it gitlab-ce grep 'Password:' /etc/gitlab/initial_root_password
+#docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
