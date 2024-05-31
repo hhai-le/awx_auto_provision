@@ -1,0 +1,57 @@
+services:
+  jenkins:
+    image: jenkins:jcasc
+    restart: always
+    hostname: jenkins
+    container_name: jenkins
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - ./jenkins/jenkins_home:/var/jenkins_home
+      - ./jenkins/jenkins_plugins:/var/jenkins_home/plugins
+  git:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: on-failure
+    hostname: 'gitlab'
+    container_name: gitlab-ce
+    environment:
+      GITLAB_ROOT_PASSWORD: 'P@3sw0rd!1@'
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://192.168.148.213:8081'
+        gitlab_rails['gitlab_shell_ssh_port'] = 8022
+    ports:
+      - '8081:8081'
+      - '8443:443'
+      - '8022:8022'
+    volumes:
+      - './gitlab/config:/etc/gitlab'
+      - './gitlab/logs:/var/log/gitlab'
+      - './gitlab/data:/var/opt/gitlab'
+  #gitlab-runner:
+  #  image: gitlab/gitlab-runner:alpine
+  #  container_name: gitlab-runner
+  #  restart: always
+  #  depends_on:
+  #    - web
+  #  volumes:
+  #    - '/var/run/docker.sock:/var/run/docker.sock'
+  #    - './gitlab/gitlab-runner:/etc/gitlab-runner'
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    hostname: vault
+    restart: on-failure:10
+    healthcheck:
+      retries: 5
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: 'http://0.0.0.0:8200'
+      VAULT_LOCAL_CONFIG: '{"listener": [{"tcp":{"address": "0.0.0.0:8200","tls_disable":"1"}}], "ui": true, "storage": [{"file": {"path":"/vault/data"}}]}'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/config:/vault/config
+      - ./vault/data:/vault/data
+    command: vault server -config vault/config/local.json
