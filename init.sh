@@ -1,7 +1,7 @@
 #!/bin/bash
 mkdir -p ./gitlab/{config,logs,data}
 mkdir -p ./vault/{config,data}
-mkdir -p ./jenkins/{jenkins_home,jenkins_plugins}
+mkdir -p ./jenkins/jenkins_home
 
 cat > compose.yml << 'EOF'
 services:
